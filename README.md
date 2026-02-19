@@ -1,187 +1,157 @@
-📌 Task Management API
+# Task Management REST API
 
-A RESTful API built with Django and Django REST Framework that allows users to manage tasks efficiently.
-The API supports authentication, full CRUD operations, and task status tracking, making it ideal for web or mobile task management applications.
+A RESTful API built with Django and Django REST Framework (DRF) that enables users to manage tasks efficiently.
 
-🚀 Project Overview
+The API provides secure authentication, full CRUD functionality, and task status tracking, making it ideal for web and mobile task management applications.
 
-The Task Management API enables users to:
+---
 
-Register and authenticate securely
+## Features
 
-Create, update, and delete tasks
+- User Authentication (Register, Login, Logout)
+- Create, Read, Update, Delete (CRUD) tasks
+- Task status tracking (Pending / Completed)
+- Due dates and priority levels
+- Filtering and searching tasks
+- User-based data isolation
+- RESTful JSON responses
 
-Mark tasks as complete or incomplete
+---
 
-Retrieve only their own tasks
+## Tech Stack
 
-Filter and paginate results
+- Backend: Django
+- API Framework: Django REST Framework
+- Database: SQLite (default, can be changed to PostgreSQL/MySQL)
+- Authentication: Token or JWT
 
-This project demonstrates best practices in REST API design, authentication, and scalable Django architecture.
+---
 
-🧱 Tech Stack
+## Project Structure
 
-Backend: Django
-
-API Framework: Django REST Framework
-
-Database: SQLite (development) / PostgreSQL (production)
-
-Authentication: JWT (SimpleJWT)
-
-Deployment: PythonAnywhere or Heroku
-
-📂 Project Structure
 task_manager_api/
 │
-├── config/                # Project settings & URLs
-├── apps/
-│   ├── users/             # User management
-│   └── tasks/             # Task functionality
-│
-├── requirements.txt
 ├── manage.py
-└── README.md
+├── requirements.txt
+│
+├── config/
+│ ├── settings.py
+│ ├── urls.py
+│ └── asgi.py / wsgi.py
+│
+├── tasks/
+│ ├── models.py
+│ ├── serializers.py
+│ ├── views.py
+│ ├── urls.py
+│ └── permissions.py
+│
+└── users/ (optional)
 
-⚙️ Installation & Setup
-1️⃣ Clone Repository
-git clone https://github.com/yourusername/task-manager-api.git
-cd task-manager-api
 
-2️⃣ Create Virtual Environment
+---
+
+## Installation & Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yourusername/task-management-api.git
+cd task-management-api
+
+2. Create a virtual environment
 python -m venv venv
-source venv/bin/activate   # macOS/Linux
-venv\Scripts\activate      # Windows
 
-3️⃣ Install Dependencies
+
+Activate:
+
+Windows
+
+venv\Scripts\activate
+
+
+Mac/Linux
+
+source venv/bin/activate
+
+3. Install dependencies
 pip install -r requirements.txt
 
-4️⃣ Run Migrations
+4. Apply migrations
 python manage.py migrate
 
-5️⃣ Create Superuser
+5. Create superuser (optional)
 python manage.py createsuperuser
 
-6️⃣ Start Development Server
+6. Run the server
 python manage.py runserver
 
 
-API will be available at:
+API base URL:
 
-http://127.0.0.1:8000/api/v1/
+http://127.0.0.1:8000/api/
 
-🔐 Authentication
+Authentication
 
-This API uses JWT Authentication.
+Example header (Token):
 
-Obtain Token
-POST /api/v1/auth/login/
+Authorization: Token your_token_here
 
-
-Response:
-
-{
-  "access": "your-access-token",
-  "refresh": "your-refresh-token"
-}
-
-
-Use token in headers:
-
-Authorization: Bearer <access_token>
-
-📡 API Endpoints
-Auth
+API Endpoints
+Authentication
 Method	Endpoint	Description
-POST	/auth/register/	Register
-POST	/auth/login/	Login
-POST	/auth/refresh/	Refresh token
-Users
-Method	Endpoint	Description
-GET	/users/me/	Current user
+POST	/api/auth/register/	Register user
+POST	/api/auth/login/	Login user
+POST	/api/auth/logout/	Logout user
 Tasks
 Method	Endpoint	Description
-GET	/tasks/	List tasks
-POST	/tasks/	Create task
-GET	/tasks/{id}/	Retrieve task
-PATCH	/tasks/{id}/	Update task
-DELETE	/tasks/{id}/	Delete task
-PATCH	/tasks/{id}/complete/	Toggle status
-🧩 Task Model
-Field	Type	Description
-id	Integer	Primary key
-title	String	Task title
-description	Text	Details
-status	Boolean	Complete or not
-due_date	Date	Optional
-created_at	DateTime	Auto timestamp
-updated_at	DateTime	Auto timestamp
-🧪 Running Tests
+GET	/api/tasks/	List tasks
+POST	/api/tasks/	Create task
+GET	/api/tasks/{id}/	Retrieve task
+PUT/PATCH	/api/tasks/{id}/	Update task
+DELETE	/api/tasks/{id}/	Delete task
+Task Object Example
+{
+  "id": 1,
+  "title": "Finish project report",
+  "description": "Complete and submit the final report",
+  "status": "Pending",
+  "priority": "High",
+  "due_date": "2026-03-01",
+  "created_at": "2026-02-18T10:00:00Z"
+}
+
+Running Tests
 python manage.py test
 
-🌍 Deployment
-PythonAnywhere
+Use Cases
 
-Create a virtualenv
+Personal productivity apps
 
-Install requirements
+Team task management systems
 
-Configure environment variables
+Mobile to-do list apps
 
-Run migrations
+Learning project for Django REST Framework
 
-Reload web app
-
-Heroku (Optional)
-heroku create
-git push heroku main
-heroku run python manage.py migrate
-
-🔒 Security Features
-
-JWT authentication
-
-User-specific querysets
-
-Environment variables for secrets
-
-Permission classes
-
-CSRF protection (session endpoints)
-
-📈 Future Improvements
-
-Task categories
-
-Notifications / reminders
+Future Improvements
 
 File attachments
 
-API documentation (Swagger)
+Notifications and reminders
 
-Async background jobs (Celery)
+Team collaboration
 
-🤝 Contributing
+Analytics dashboard
 
-Fork the repo
+Docker support
 
-Create feature branch
+Contributing
 
-git checkout -b feature-name
+Fork the repository
 
+Create a feature branch
 
 Commit changes
 
-git commit -m "Add feature"
-
-
-Push and open Pull Request
-
-📜 License
-
-This project is licensed under the MIT License.
-
-👨‍💻 Author
-
-Eyob Abera
-Backend Developer | Django & DRF
+Open a Pull Request
