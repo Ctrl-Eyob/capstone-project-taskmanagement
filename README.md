@@ -6,16 +6,6 @@ This project showcases production-level backend architecture, relational databas
 
 ---
 
-## 🌍 Live Deployment
-
-Base URL
-https://your-app-name.onrender.com/
-
-API Documentation (Swagger / OpenAPI)
-https://your-app-name.onrender.com/api/docs/
-
----
-
 ## 🧠 Executive Summary
 
 The API enables authenticated users to manage categorized tasks with enterprise-ready capabilities:
