@@ -1,157 +1,276 @@
-# Task Management REST API
+# 🚀 Task Management API
+Production-Grade Django REST Backend
 
-A RESTful API built with Django and Django REST Framework (DRF) that enables users to manage tasks efficiently.
-
-The API provides secure authentication, full CRUD functionality, and task status tracking, making it ideal for web and mobile task management applications.
-
----
-
-## Features
-
-- User Authentication (Register, Login, Logout)
-- Create, Read, Update, Delete (CRUD) tasks
-- Task status tracking (Pending / Completed)
-- Due dates and priority levels
-- Filtering and searching tasks
-- User-based data isolation
-- RESTful JSON responses
+A scalable, secure, and cloud-ready Task Management API built with Django and Django REST Framework.
+This project showcases production-level backend architecture, relational database modeling, secure authentication, environment-driven configuration, and deployment practices suitable for real-world SaaS applications.
 
 ---
 
-## Tech Stack
+## 🌍 Live Deployment
 
-- Backend: Django
-- API Framework: Django REST Framework
-- Database: SQLite (default, can be changed to PostgreSQL/MySQL)
-- Authentication: Token or JWT
+Base URL
+https://your-app-name.onrender.com/
+
+API Documentation (Swagger / OpenAPI)
+https://your-app-name.onrender.com/api/docs/
 
 ---
 
-## Project Structure
+## 🧠 Executive Summary
 
-task_manager_api/
+The API enables authenticated users to manage categorized tasks with enterprise-ready capabilities:
+
+- JWT-based authentication
+- Extended user profiles
+- Task categorization
+- Filtering & pagination
+- Email integration
+- PostgreSQL production setup
+- Cloud deployment readiness
+
+The system is structured with clean separation of concerns and scalable backend engineering principles.
+
+---
+
+## 🏗 System Architecture
+
+taskmanager/
+│
+├── taskmanager/              # Project configuration
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+│
+├── tasks/                    # Core domain logic
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   ├── urls.py
+│   └── signals.py
 │
 ├── manage.py
 ├── requirements.txt
-│
-├── config/
-│ ├── settings.py
-│ ├── urls.py
-│ └── asgi.py / wsgi.py
-│
-├── tasks/
-│ ├── models.py
-│ ├── serializers.py
-│ ├── views.py
-│ ├── urls.py
-│ └── permissions.py
-│
-└── users/ (optional)
+├── Procfile
+└── runtime.txt
 
+Architectural Principles
+
+- RESTful resource design
+- Stateless JWT authentication
+- Environment-based configuration
+- User-scoped querysets for data isolation
+- Modular Django app structure
+- Production-first mindset
 
 ---
 
-## Installation & Setup
+## ✨ Core Features
 
-### 1. Clone the repository
+### 🔐 Authentication & Authorization
+- JWT authentication (SimpleJWT)
+- Access & refresh tokens
+- Protected endpoints
+- User-specific data isolation
 
-```bash
+### 👤 User Profile System
+- One-to-one extension of Django User model
+- Automatic profile creation via signals
+- Extensible architecture
+
+### 📋 Task Management
+- Create, retrieve, update, and delete tasks
+- Due dates and priority levels
+- Completion tracking
+- Ownership enforcement
+
+### 🗂 Task Categorization
+- Assign tasks to categories
+- Filter tasks by category
+- Enforced foreign key relationships
+
+### 📊 Filtering & Pagination
+- PageNumberPagination
+- django-filter integration
+- Controlled query exposure
+
+### 📧 Email Integration
+- Console backend for development
+- SMTP-ready for production
+- Extensible reminder support
+
+### 📘 API Documentation
+- OpenAPI 3 schema
+- Swagger UI
+- Auto-generated via drf-spectacular
+
+---
+
+## 🗄 Database Design (ER Overview)
+
+User (1) ─── (1) Profile  
+User (1) ─── (M) Task  
+Category (1) ─── (M) Task  
+
+Design Rationale
+
+- Profiles separated to preserve authentication integrity
+- Tasks scoped per user for strict data isolation
+- Categories normalized to prevent redundancy
+- Foreign keys enforce referential integrity
+- Timestamps support auditing and tracking
+
+---
+
+## 🛠 Technology Stack
+
+Language: Python 3.12  
+Framework: Django  
+API: Django REST Framework  
+Auth: SimpleJWT  
+Dev Database: SQLite  
+Prod Database: PostgreSQL  
+Server: Gunicorn  
+Static Files: WhiteNoise  
+Filtering: django-filter  
+Docs: drf-spectacular  
+Deployment: Render / Heroku  
+
+---
+
+## ⚙️ Local Development Setup
+
+### Clone Repository
 git clone https://github.com/yourusername/task-management-api.git
 cd task-management-api
 
-2. Create a virtual environment
-python -m venv venv
-
-
-Activate:
+### Create Virtual Environment
 
 Windows
-
+python -m venv venv
 venv\Scripts\activate
 
-
-Mac/Linux
-
+Mac / Linux
+python3 -m venv venv
 source venv/bin/activate
 
-3. Install dependencies
+### Install Dependencies
 pip install -r requirements.txt
 
-4. Apply migrations
+### Apply Migrations
+python manage.py makemigrations
 python manage.py migrate
 
-5. Create superuser (optional)
+### Create Superuser
 python manage.py createsuperuser
 
-6. Run the server
+### Run Development Server
 python manage.py runserver
 
+Swagger Docs
+http://127.0.0.1:8000/api/docs/
 
-API base URL:
+---
 
-http://127.0.0.1:8000/api/
+## 🔐 Authentication Flow
 
-Authentication
+Register
+POST /api/register/
 
-Example header (Token):
+Obtain Token
+POST /api/token/
 
-Authorization: Token your_token_here
-
-API Endpoints
-Authentication
-Method	Endpoint	Description
-POST	/api/auth/register/	Register user
-POST	/api/auth/login/	Login user
-POST	/api/auth/logout/	Logout user
-Tasks
-Method	Endpoint	Description
-GET	/api/tasks/	List tasks
-POST	/api/tasks/	Create task
-GET	/api/tasks/{id}/	Retrieve task
-PUT/PATCH	/api/tasks/{id}/	Update task
-DELETE	/api/tasks/{id}/	Delete task
-Task Object Example
+Response
 {
-  "id": 1,
-  "title": "Finish project report",
-  "description": "Complete and submit the final report",
-  "status": "Pending",
-  "priority": "High",
-  "due_date": "2026-03-01",
-  "created_at": "2026-02-18T10:00:00Z"
+  "access": "your_access_token",
+  "refresh": "your_refresh_token"
 }
 
-Running Tests
-python manage.py test
+Authenticated Requests
+Authorization: Bearer <access_token>
 
-Use Cases
+Refresh Token
+POST /api/token/refresh/
 
-Personal productivity apps
+---
 
-Team task management systems
+## 📡 API Endpoint Overview
 
-Mobile to-do list apps
+Tasks
+GET     /api/tasks/
+POST    /api/tasks/
+GET     /api/tasks/{id}/
+PUT     /api/tasks/{id}/
+DELETE  /api/tasks/{id}/
 
-Learning project for Django REST Framework
+Categories
+GET     /api/categories/
+POST    /api/categories/
 
-Future Improvements
+Profile
+GET     /api/profile/
+PUT     /api/profile/
 
-File attachments
+---
 
-Notifications and reminders
+## 🗄 Database Strategy
 
-Team collaboration
+Development
+- SQLite for simplicity
 
-Analytics dashboard
+Production
+- PostgreSQL
+- Environment variable configuration
+- dj-database-url integration
+- Connection pooling enabled
 
-Docker support
+---
 
-Contributing
+## 🚀 Deployment Strategy
 
-Fork the repository
+Render (Recommended)
+1. Push project to GitHub
+2. Create a Web Service on Render
+3. Configure environment variables
+4. Deploy and run migrations
 
-Create a feature branch
+Heroku
+heroku login
+heroku create your-app-name
+heroku addons:create heroku-postgresql:hobby-dev
+heroku config:set SECRET_KEY=your-secret
+heroku config:set DEBUG=False
+heroku config:set ALLOWED_HOSTS=your-app.herokuapp.com
+git push heroku main
+heroku run python manage.py migrate
 
-Commit changes
+---
 
-Open a Pull Request
+## 🔒 Security Considerations
+
+- DEBUG disabled in production
+- Secrets stored in environment variables
+- Stateless JWT authentication
+- Secure cookies enabled
+- SSL redirect enforced
+- XSS and content-type protections
+- User-scoped querysets
+- Referential integrity enforced
+
+---
+
+## 📈 Scalability & Extensibility
+
+- Celery + Redis for background jobs
+- Scheduled email reminders
+- Role-Based Access Control (RBAC)
+- Real-time updates (WebSockets)
+- Docker containerization
+- CI/CD pipeline integration
+- Horizontal scaling
+- Monitoring & observability
+
+---
+
+## 👨‍💻 Author
+
+Eyob Abera
