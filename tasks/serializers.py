@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from django.utils import timezone
 from django.contrib.auth.models import User
-from .models import Task
+from django.utils import timezone
+from .models import Task, Category, Profile
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -13,6 +13,19 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
+        read_only_fields = ["user", "created_at"]
+
+    def create(self, validated_data):
+        return Category.objects.create(
+            user=self.context["request"].user,
+            **validated_data
+        )
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -36,3 +49,10 @@ class TaskSerializer(serializers.ModelSerializer):
             user=self.context["request"].user,
             **validated_data
         )
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = "__all__"
+        read_only_fields = ["user"]
