@@ -1,47 +1,58 @@
-from rest_framework import generics, viewsets, filters
-from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework import serializers
 from django.contrib.auth.models import User
-from django_filters.rest_framework import DjangoFilterBackend
-
-from .models import Task
-from .serializers import TaskSerializer, RegisterSerializer
-from .permissions import IsOwner
+from django.utils import timezone
+from .models import Task, Category, Profile
 
 
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
-    permission_classes = []
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=6)
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "password"]
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
 
 
-class TaskViewSet(viewsets.ModelViewSet):
-    serializer_class = TaskSerializer
-    permission_classes = [IsOwner]
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
+        read_only_fields = ["user", "created_at"]
 
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter,
-    ]
+    def create(self, validated_data):
+        return Category.objects.create(
+            user=self.context["request"].user,
+            **validated_data
+        )
 
-    filterset_fields = ["status", "due_date", "priority"]
-    search_fields = ["title", "description"]
-    ordering_fields = ["due_date", "created_at", "priority"]
 
-    def get_queryset(self):
-        return Task.objects.filter(user=self.request.user)
+class TaskSerializer(serializers.ModelSerializer):
+    is_overdue = serializers.SerializerMethodField()
 
-    @action(detail=True, methods=["patch"])
-    def complete(self, request, pk=None):
-        task = self.get_object()
-        task.status = Task.StatusChoices.COMPLETED
-        task.save()
-        return Response({"message": "Task marked as completed"})
+    class Meta:
+        model = Task
+        fields = "__all__"
+        read_only_fields = ["user", "created_at", "updated_at"]
 
-    @action(detail=True, methods=["patch"])
-    def incomplete(self, request, pk=None):
-        task = self.get_object()
-        task.status = Task.StatusChoices.PENDING
-        task.save()
-        return Response({"message": "Task marked as pending"})
+    def get_is_overdue(self, obj):
+        return obj.is_overdue()
+
+    def validate_due_date(self, value):
+        if value < timezone.now().date():
+            raise serializers.ValidationError("Due date cannot be in the past.")
+        return value
+
+    def create(self, validated_data):
+        return Task.objects.create(
+            user=self.context["request"].user,
+            **validated_data
+        )
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = "__all__"
+        read_only_fields = ["user"]
