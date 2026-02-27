@@ -130,8 +130,8 @@ Deployment: Render / Heroku
 ## ⚙️ Local Development Setup
 
 ### Clone Repository
-git clone https://github.com/yourusername/task-management-api.git
-cd task-management-api
+git clone https://github.com/yourusername/task-management.git
+cd task-management
 
 ### Create Virtual Environment
 
