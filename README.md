@@ -130,8 +130,8 @@ Deployment: Render / Heroku
 ## ⚙️ Local Development Setup
 
 ### Clone Repository
-git clone https://github.com/yourusername/task-management.git
-cd task-management
+git clone https://github.com/yourusername/capstone-project-taskmanagement.git
+cd capstone-project-taskmanagement
 
 ### Create Virtual Environment
 
