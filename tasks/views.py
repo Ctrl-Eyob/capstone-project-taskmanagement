@@ -1,58 +1,86 @@
-from rest_framework import serializers
+from rest_framework import generics, viewsets, filters
+from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.contrib.auth.models import User
-from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
+from django.core.mail import send_mail
+from django.conf import settings
+
 from .models import Task, Category, Profile
+from .serializers import (
+    TaskSerializer,
+    RegisterSerializer,
+    CategorySerializer,
+    ProfileSerializer
+)
+from .permissions import IsOwner
 
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=6)
-
-    class Meta:
-        model = User
-        fields = ["username", "email", "password"]
-
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+    permission_classes = []
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = "__all__"
-        read_only_fields = ["user", "created_at"]
+class CategoryViewSet(viewsets.ModelViewSet):
+    serializer_class = CategorySerializer
+    permission_classes = [IsOwner]
 
-    def create(self, validated_data):
-        return Category.objects.create(
-            user=self.context["request"].user,
-            **validated_data
+    def get_queryset(self):
+        return Category.objects.filter(user=self.request.user)
+
+
+class TaskViewSet(viewsets.ModelViewSet):
+    serializer_class = TaskSerializer
+    permission_classes = [IsOwner]
+
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
+
+    filterset_fields = ["status", "due_date", "priority", "category"]
+    search_fields = ["title", "description"]
+    ordering_fields = ["due_date", "created_at", "priority"]
+
+    def get_queryset(self):
+        return Task.objects.filter(user=self.request.user)
+
+    @action(detail=True, methods=["patch"])
+    def complete(self, request, pk=None):
+        task = self.get_object()
+        task.status = Task.StatusChoices.COMPLETED
+        task.save()
+        return Response({"message": "Task marked as completed"})
+
+    @action(detail=True, methods=["patch"])
+    def incomplete(self, request, pk=None):
+        task = self.get_object()
+        task.status = Task.StatusChoices.PENDING
+        task.save()
+        return Response({"message": "Task marked as pending"})
+
+    @action(detail=True, methods=["post"])
+    def send_reminder(self, request, pk=None):
+        task = self.get_object()
+
+        if not task.user.profile.email_notifications:
+            return Response({"message": "Email notifications disabled"})
+
+        send_mail(
+            subject=f"Reminder: {task.title}",
+            message=f"Your task '{task.title}' is due on {task.due_date}.",
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[task.user.email],
         )
 
-
-class TaskSerializer(serializers.ModelSerializer):
-    is_overdue = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Task
-        fields = "__all__"
-        read_only_fields = ["user", "created_at", "updated_at"]
-
-    def get_is_overdue(self, obj):
-        return obj.is_overdue()
-
-    def validate_due_date(self, value):
-        if value < timezone.now().date():
-            raise serializers.ValidationError("Due date cannot be in the past.")
-        return value
-
-    def create(self, validated_data):
-        return Task.objects.create(
-            user=self.context["request"].user,
-            **validated_data
-        )
+        return Response({"message": "Reminder email sent"})
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = "__all__"
-        read_only_fields = ["user"]
+class ProfileViewSet(viewsets.ModelViewSet):
+    serializer_class = ProfileSerializer
+    permission_classes = [IsOwner]
+
+    def get_queryset(self):
+        return Profile.objects.filter(user=self.request.user)
