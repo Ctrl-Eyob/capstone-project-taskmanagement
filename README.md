@@ -122,8 +122,7 @@ Prod Database: PostgreSQL
 Server: Gunicorn  
 Static Files: WhiteNoise  
 Filtering: django-filter  
-Docs: drf-spectacular  
-Deployment: Render / Heroku  
+Docs: drf-spectacular   
 
 ---
 
